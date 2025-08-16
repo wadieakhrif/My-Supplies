@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<img src="logo.png" alt="شعار الموقع" width="120">
+<header style="display:flex;align-items:center;gap:12px;justify-content:center;">
+  <img src="LOGO.png" alt="شعار الموقع" style="height:40px;border-radius:6px;">
+  <span>أدواتي الذكية — OCR + صور + أسعار</span>
+</header>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>أدواتي الذكية (بدون خدمات خارجية مدفوعة)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>أدواتي الذكية مع OCR وسعر السوق</title>
 <style>
   :root { --pri:#0d6efd; --bg:#f6f9ff; --card:#fff; --muted:#6c757d; }
-  body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto; color:#222;}
+  body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto;color:#222;}
   header{background:var(--pri);color:#fff;padding:18px 14px;font-weight:700;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.15)}
   .wrap{max-width:960px;margin:24px auto;padding:0 14px}
   .row{display:flex;gap:12px;flex-wrap:wrap}
@@ -24,7 +27,7 @@
   .actions{display:flex;gap:8px;margin-top:6px}
   .chipbar{display:flex;flex-wrap:wrap;gap:8px}
   .chip{background:#fff;border:1px dashed #cfe0ff;color:#0d3fb3;padding:8px 10px;border-radius:999px;cursor:pointer}
-  .qty{width:64px;padding:6px 8px;border:1px solid #e0e6f9;border-radius:8px}
+  .qty,.price{width:64px;padding:6px 8px;border:1px solid #e0e6f9;border-radius:8px}
   .del{background:#ef233c}
   .ok{background:#20c997}
   .done{opacity:.55;text-decoration:line-through}
@@ -33,13 +36,14 @@
 </style>
 </head>
 <body>
-<header>أدواتي الذكية — يعمل محليًا وبدون مفاتيح</header>
+<header>أدواتي الذكية — OCR + صور + أسعار</header>
 <div class="wrap">
 
-  <!-- إدخال يدوي -->
+  <!-- إدخال يدوي أو صورة -->
   <div class="card">
     <div class="row">
-      <input id="inp" class="input" placeholder="اكتب اسم المنتج: مثال (دفتر 96 صفحة A4 غلاف أزرق)"/>
+      <input id="inp" class="input" placeholder="اكتب اسم المنتج أو اختر صورة"/>
+      <input type="file" id="imgFile" accept="image/*"/>
       <button class="btn" id="addBtn">إضافة بالذكاء</button>
     </div>
     <div class="chipbar tiny muted" style="margin-top:8px">
@@ -47,12 +51,9 @@
       <span class="chip" data-q="دفتر 96 صفحة A4 غلاف أزرق">دفتر 96 صفحة A4</span>
       <span class="chip" data-q="كتاب الرياضيات سنة الأولى">كتاب الرياضيات</span>
       <span class="chip" data-q="قلم حبر أزرق">قلم حبر أزرق</span>
-      <span class="chip" data-q="غلاف شفاف A4">غلاف شفاف A4</span>
-      <span class="chip" data-q="قلم رصاص HB 2">قلم رصاص HB</span>
-      <span class="chip" data-q="مسطرة 30 سم">مسطرة 30 سم</span>
     </div>
     <div class="hr"></div>
-    <div class="tiny muted">يتم تحليل العربية محليًا: تصنيف النوع + استخراج الكمية/الصفحات/اللون/المقاس، ثم جلب صورة تلقائيًا من Wikimedia.</div>
+    <div class="tiny muted">يمكنك رفع صورة لقائمة الأدوات وسيقوم الذكاء الصناعي بقراءة أسماء الأدوات وإضافتها تلقائيًا.</div>
   </div>
 
   <!-- القائمة -->
@@ -66,179 +67,74 @@
 
 </div>
 
-<script>
-/* ===================== أدوات عربية أساسية ===================== */
-// إزالة التشكيل والتمديد وتوحيد الألف والياء والتاء المربوطة
-function normalizeArabic(s){
-  if(!s) return '';
-  return s
-    .replace(/[\u064B-\u0652]/g,'')     // حركات
-    .replace(/ـ/g,'')                   // تطويل
-    .replace(/[إأآ]/g,'ا')
-    .replace(/ى/g,'ي')
-    .replace(/ة/g,'ه')
-    .replace(/[^\u0600-\u06FF0-9a-zA-Z\s]/g,' ') // إزالة الرموز
-    .replace(/\s+/g,' ')
-    .trim();
-}
-// تحويل الأرقام العربية إلى إنجليزية
-function arabicDigitsToLatin(s){
-  const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
-  return s.replace(/[٠-٩]/g, d => map[d] || d);
-}
-// مسافة تحرير بسيطة لتصحيح الكلمات الشائعة
-function lev(a,b){
-  a= a.toLowerCase(); b= b.toLowerCase();
-  const m=a.length,n=b.length; const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));
-  for(let i=0;i<=m;i++) dp[i][0]=i;
-  for(let j=0;j<=n;j++) dp[0][j]=j;
-  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++){
-    const cost=a[i-1]===b[j-1]?0:1;
-    dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);
-  }
-  return dp[m][n];
-}
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
-/* ===================== قواميس بسيطة ===================== */
-const CANON = {
-  'دفتر':['دفتر','كراس','كراس','دفت','دفترر'],
-  'كتاب':['كتاب','مقرر','كتاب مدرسي'],
-  'غلاف':['غلاف','كسوه','حافظه','كفر'],
-  'قلم حبر':['قلم حبر','قلم جاف','bic','بيك','ستيلو'],
-  'قلم رصاص':['قلم رصاص','HB','ايش بي'],
-  'ألوان':['الوان','الوان خشبيه','الوان مائيه','صباغه'],
-  'ممحاة':['ممحاه','محيه','محايه'],
-  'مسطرة':['مسطره','مسطره 30'],
-  'براية':['مبراة','برايه'],
-  'حقيبة':['حقيبه','محفظه','شنطه'],
-  'آلة حاسبة':['اله حاسبه','حاسبه','كالكولاتريس']
-};
+<script>
+/* ===================== أدوات عربية ===================== */
+function normalizeArabic(s){if(!s) return ''; return s.replace(/[\u064B-\u0652]/g,'').replace(/ـ/g,'').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[^\u0600-\u06FF0-9a-zA-Z\s]/g,' ').replace(/\s+/g,' ').trim();}
+function arabicDigitsToLatin(s){const map={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};return s.replace(/[٠-٩]/g,d=>map[d]||d);}
+function lev(a,b){a=a.toLowerCase();b=b.toLowerCase();const m=a.length,n=b.length;const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++) dp[i][0]=i;for(let j=0;j<=n;j++) dp[0][j]=j;for(let i=1;i<=m;i++) for(let j=1;j<=n;j++){const cost=a[i-1]===b[j-1]?0:1;dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);}return dp[m][n];}
+
+/* ===================== قواميس ===================== */
+const CANON = {'دفتر':['دفتر','كراس'],'كتاب':['كتاب','مقرر'],'قلم حبر':['قلم حبر','قلم جاف'],'قلم رصاص':['قلم رصاص','HB'],'ألوان':['الوان'],'ممحاة':['ممحاه'],'مسطرة':['مسطره'],'براية':['مبراة'],'حقيبة':['حقيبه'],'آلة حاسبة':['حاسبه']};
 const COLORS = ['احمر','ازرق','ازرق داكن','ازرق فاتح','اخضر','اصفر','اسود','ابيض','برتقالي','بنفسجي','وردي','رمادي','بني','شفاف'];
 const SIZES  = ['A4','A5','A3','A6','B5','B4','B6'];
 const WORD_QTY = ['قطعه','قطع','نسخه','نسخ','علبه','علب','حبه','حبات'];
-/* ===================== تصحيح و تصنيف ===================== */
-function bestCanonical(token){
-  let best=''; let bestScore=1e9;
-  for(const [canon,vars] of Object.entries(CANON)){
-    for(const v of vars){
-      const d=lev(token,normalizeArabic(v));
-      if(d<bestScore){ bestScore=d; best=canon; }
-    }
-    const d2=lev(token,normalizeArabic(canon));
-    if(d2<bestScore){ bestScore=d2; best=canon; }
-  }
-  return (bestScore<=2)?best:null; // سماح بخطأين
-}
-function classify(textRaw){
-  let text = arabicDigitsToLatin(normalizeArabic(textRaw));
-  const original = text;
 
-  // استخراج رقم الكمية: نمط "x2" أو "2 قطع" أو أول رقم
-  let qty = 1;
-  const qtyMatch = text.match(/(?:x|\*|\s)(\d{1,3})\b/) || text.match(new RegExp(`\\b(\\d{1,3})\\s*(?:${WORD_QTY.join('|')})\\b`));
-  if(qtyMatch) qty = Math.max(1, parseInt(qtyMatch[1],10));
+/* ===================== تصنيف ===================== */
+function bestCanonical(token){let best='';let bestScore=1e9;for(const [canon,vars] of Object.entries(CANON)){for(const v of vars){const d=lev(token,normalizeArabic(v));if(d<bestScore){bestScore=d;best=canon;}}const d2=lev(token,normalizeArabic(canon));if(d2<bestScore){bestScore=d2;best=canon;}}return (bestScore<=2)?best:null;}
+function classify(textRaw){let text = arabicDigitsToLatin(normalizeArabic(textRaw)); const original=text; let qty=1; const qtyMatch=text.match(/(?:x|\*|\s)(\d{1,3})\b/) || text.match(new RegExp(`\\b(\\d{1,3})\\s*(?:${WORD_QTY.join('|')})\\b`)); if(qtyMatch) qty=parseInt(qtyMatch[1],10); let pages=null; const pg=text.match(/\b(\d{2,4})\s*(?:صفحه|ورقه|صفحات|ورقات|ص)\b/); if(pg) pages=parseInt(pg[1],10); let size=null; for(const s of SIZES){if(text.toUpperCase().includes(s)) {size=s;break;}} let color=null; for(const c of COLORS){if(text.includes(normalizeArabic(c))){color=c;break;}} const tokens=text.split(' '); let type=null; for(const t of tokens){const cand=bestCanonical(t); if(cand){type=cand;break;}} if(!type){if(/hb\b|\b2h\b|\bhb2\b/i.test(original)) type='قلم رصاص';} let subject=null; if(type==='كتاب'){const m=original.replace(/[0-9]/g,'').trim(); subject=m.replace(/كتاب|مقرر/gi,'').trim() || null;} let nameParts=[]; if(type) nameParts.push(type); if(subject) nameParts.push(subject); if(pages) nameParts.push(`${pages} صفحة`); if(size) nameParts.push(size); if(color) nameParts.push(color); const smartName=nameParts.join(' ').trim() || original; return { type:type||'أداة', name:smartName, qty,pages,size,color,raw:original, price:''};}
 
-  // الصفحات: 32/48/96/100… + كلمة صفحة/ورقة/ص/ص.
-  let pages = null;
-  const pg = text.match(/\b(\d{2,4})\s*(?:صفحه|ورقه|صفحات|ورقات|ص)\b/);
-  if(pg){ pages = parseInt(pg[1],10); }
-
-  // المقاس (A4/A5…)
-  let size = null; for(const s of SIZES){ if(text.toUpperCase().includes(s)) { size=s; break; } }
-
-  // اللون
-  let color = null; for(const c of COLORS){ if(text.includes(normalizeArabic(c))) { color=c; break; } }
-
-  // tokens للتصنيف
-  const tokens = text.split(' ');
-  let type = null;
-  for(const t of tokens){
-    const cand = bestCanonical(t);
-    if(cand){ type=cand; break; }
-  }
-  if(!type){
-    // محاولات خاصة
-    if(/hb\b|\b2h\b|\bhb2\b/i.test(original)) type='قلم رصاص';
-  }
-
-  // موضوع/عنوان للكتب
-  let subject=null;
-  if(type==='كتاب'){
-    const m = original.replace(/[0-9]/g,'').trim();
-    subject = m.replace(/كتاب|مقرر/gi,'').trim() || null;
-  }
-
-  // اسم نهائي ذكي
-  let nameParts=[];
-  if(type) nameParts.push(type);
-  if(subject) nameParts.push(subject);
-  if(pages) nameParts.push(`${pages} صفحة`);
-  if(size)  nameParts.push(size);
-  if(color) nameParts.push(color);
-  const smartName = nameParts.join(' ').trim() || original;
-
-  return { type: type||'أداة', name: smartName, qty, pages, size, color, raw: original };
-}
-
-/* ===================== صور تلقائية (Wikimedia Commons) ===================== */
-// بحث مجاني بدون مفتاح. نزيد “مدرسي/أداة” لتحسين الدقة.
-async function fetchImage(query){
-  const q = encodeURIComponent(query + ' مدرسي');
-  const url = `https://commons.wikimedia.org/w/api.php?action=query&origin=*&format=json&prop=pageimages|imageinfo&generator=search&gsrnamespace=6&gsrlimit=10&gsrsearch=${q}&piprop=thumbnail&pithumbsize=300&iiprop=url`;
-  try{
-    const res = await fetch(url);
-    const data = await res.json();
-    if(data?.query?.pages){
-      const pages = Object.values(data.query.pages);
-      const withThumb = pages.find(p=>p.thumbnail?.source) || pages[0];
-      if(withThumb?.thumbnail?.source) return withThumb.thumbnail.source;
-    }
-  }catch(e){}
-  // بديل آمن
-  return `https://via.placeholder.com/300x300?text=${encodeURIComponent(query)}`;
-}
+/* ===================== صور تلقائية (placeholder) ===================== */
+async function fetchImage(query){return `https://via.placeholder.com/300x300?text=${encodeURIComponent(query)}`;}
 
 /* ===================== تخزين محلي ===================== */
-let items = JSON.parse(localStorage.getItem('ai_school_items')||'[]');
-function save(){ localStorage.setItem('ai_school_items', JSON.stringify(items)); }
+let items=JSON.parse(localStorage.getItem('ai_school_items')||'[]');
+function save(){localStorage.setItem('ai_school_items',JSON.stringify(items));}
 
 /* ===================== واجهة ===================== */
-const inp = document.getElementById('inp');
-const addBtn = document.getElementById('addBtn');
-const list = document.getElementById('list');
-const clearBtn = document.getElementById('clearBtn');
-const search = document.getElementById('search');
+const inp=document.getElementById('inp');
+const addBtn=document.getElementById('addBtn');
+const list=document.getElementById('list');
+const clearBtn=document.getElementById('clearBtn');
+const search=document.getElementById('search');
+const imgFile=document.getElementById('imgFile');
 
-document.querySelectorAll('.chip').forEach(ch=>{
-  ch.addEventListener('click', ()=>{ inp.value = ch.dataset.q; });
-});
+document.querySelectorAll('.chip').forEach(ch=>{ch.addEventListener('click',()=>{inp.value=ch.dataset.q;});});
+
+async function addItem(name){
+  const obj=classify(name);
+  obj.img=await fetchImage(obj.name||obj.type);
+  items.push(obj);
+  save();
+  render();
+}
 
 addBtn.addEventListener('click', async ()=>{
-  const val = inp.value.trim();
-  if(!val) return;
-  addBtn.disabled = true; addBtn.textContent='يعالج…';
-  const obj = classify(val);
-  const img = await fetchImage(obj.name || obj.type);
-  items.push({ ...obj, done:false, img });
-  save(); render();
-  addBtn.disabled = false; addBtn.textContent='إضافة بالذكاء';
-  inp.value='';
+  addBtn.disabled=true; addBtn.textContent='يعالج…';
+  if(inp.value.trim()) await addItem(inp.value.trim());
+  else if(imgFile.files[0]){
+    const file=imgFile.files[0];
+    Tesseract.recognize(file,'ara').then(async({data:{text}})=>{
+      const lines=text.split('\n').filter(l=>l.trim());
+      for(const line of lines) await addItem(line.trim());
+    });
+  }
+  addBtn.disabled=false; addBtn.textContent='إضافة بالذكاء';
+  inp.value=''; imgFile.value='';
 });
 
-clearBtn.addEventListener('click', ()=>{
-  if(confirm('حذف كل العناصر؟')){ items=[]; save(); render(); }
-});
-search.addEventListener('input', render);
+clearBtn.addEventListener('click',()=>{if(confirm('حذف كل العناصر؟')){items=[];save();render();}});
+search.addEventListener('input',render);
 
 function render(){
-  const q = normalizeArabic(search.value||'');
+  const q=normalizeArabic(search.value||'');
   list.innerHTML='';
-  items
-    .filter(it=> !q || normalizeArabic(it.name).includes(q) || normalizeArabic(it.type).includes(q))
+  items.filter(it=>!q||normalizeArabic(it.name).includes(q)||normalizeArabic(it.type).includes(q))
     .forEach((it,idx)=>{
-      const card = document.createElement('div'); card.className='card';
+      const card=document.createElement('div'); card.className='card';
       if(it.done) card.classList.add('done');
-      card.innerHTML = `
+      card.innerHTML=`
         <div class="item">
           <img class="thumb" src="${it.img}" alt="">
           <div class="meta">
@@ -249,6 +145,7 @@ function render(){
               ${it.size?`<span class="tag">${it.size}</span>`:''}
               ${it.color?`<span class="tag">${it.color}</span>`:''}
               <span class="tag">كمية: <input class="qty" type="number" min="1" value="${it.qty}" data-i="${idx}"></span>
+              <span class="tag">السعر (DH): <input class="price" type="number" min="0" value="${it.price||''}" data-i="${idx}"></span>
             </div>
             <div class="actions">
               <button class="btn ok" data-done="${idx}">${it.done?'إلغاء':'تم'}</button>
@@ -260,16 +157,10 @@ function render(){
       list.appendChild(card);
     });
 
-  // أحداث ديناميكية
-  list.querySelectorAll('input.qty').forEach(el=>{
-    el.onchange = (e)=>{ const i=+e.target.dataset.i; items[i].qty = Math.max(1, parseInt(e.target.value||'1')); save(); };
-  });
-  list.querySelectorAll('button[data-done]').forEach(btn=>{
-    btn.onclick = ()=>{ const i=+btn.dataset.done; items[i].done=!items[i].done; save(); render(); };
-  });
-  list.querySelectorAll('button[data-del]').forEach(btn=>{
-    btn.onclick = ()=>{ const i=+btn.dataset.del; items.splice(i,1); save(); render(); };
-  });
+  list.querySelectorAll('input.qty').forEach(el=>{el.onchange=e=>{const i=+e.target.dataset.i;items[i].qty=Math.max(1,parseInt(e.target.value||'1'));save();};});
+  list.querySelectorAll('input.price').forEach(el=>{el.onchange=e=>{const i=+e.target.dataset.i;items[i].price=parseFloat(e.target.value||'0');save();};});
+  list.querySelectorAll('button[data-done]').forEach(btn=>{btn.onclick=()=>{const i=+btn.dataset.done; items[i].done=!items[i].done; save(); render();};});
+  list.querySelectorAll('button[data-del]').forEach(btn=>{btn.onclick=()=>{const i=+btn.dataset.del; items.splice(i,1); save(); render();};});
 }
 render();
 </script>
