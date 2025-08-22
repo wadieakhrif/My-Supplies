@@ -1,168 +1,42 @@
 <!DOCTYPE html>
-<header style="display:flex;align-items:center;gap:12px;justify-content:center;">
-  <img src="LOGO.png" alt="شعار الموقع" style="height:40px;border-radius:6px;">
-  <span>أدواتي الذكية — OCR + صور + أسعار</span>
-</header>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>أدواتي الذكية مع OCR وسعر السوق</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wody Designer</title>
 <style>
-  :root { --pri:#0d6efd; --bg:#f6f9ff; --card:#fff; --muted:#6c757d; }
-  body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto;color:#222;}
-  header{background:var(--pri);color:#fff;padding:18px 14px;font-weight:700;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-  .wrap{max-width:960px;margin:24px auto;padding:0 14px}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  .card{background:var(--card);border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.06);padding:16px}
-  .input{flex:1;min-width:220px;border:1px solid #dfe7ff;border-radius:10px;padding:12px 14px;font-size:16px;outline:none}
-  .btn{background:var(--pri);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
-  .btn:disabled{opacity:.6;cursor:not-allowed}
-  .muted{color:var(--muted);font-size:13px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}
-  .item{display:flex;gap:10px;align-items:center}
-  .thumb{width:64px;height:64px;border-radius:10px;border:1px solid #e9eefc;object-fit:cover;background:#eef3ff}
-  .meta{display:flex;flex-direction:column;gap:6px}
-  .tag{display:inline-block;background:#eef3ff;border:1px solid #dfe7ff;color:#2953d6;border-radius:999px;padding:2px 8px;font-size:12px;margin-inline-end:6px}
-  .actions{display:flex;gap:8px;margin-top:6px}
-  .chipbar{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{background:#fff;border:1px dashed #cfe0ff;color:#0d3fb3;padding:8px 10px;border-radius:999px;cursor:pointer}
-  .qty,.price{width:64px;padding:6px 8px;border:1px solid #e0e6f9;border-radius:8px}
-  .del{background:#ef233c}
-  .ok{background:#20c997}
-  .done{opacity:.55;text-decoration:line-through}
-  .hr{height:1px;background:#e8eefc;margin:18px 0}
-  .tiny{font-size:12px}
+  body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; color: #333; }
+  header { background-color: #1e1e1e; color: #fff; padding: 30px 20px; text-align: center; }
+  header h1 { margin: 0; font-size: 2.2em; }
+  header p { margin: 10px 0 0; font-size: 1em; color: #ccc; }
+  .gallery { display: flex; justify-content: center; padding: 30px 20px; }
+  .gallery img { max-width: 100%; width: 400px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .contact { background-color: #fff; padding: 30px 20px; margin: 20px auto; width: 90%; max-width: 500px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+  .contact h2 { margin-top: 0; }
+  .contact a { color: #fff; background-color: #E1306C; padding: 12px 25px; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 15px; font-weight: bold; }
+  footer { background-color: #1e1e1e; color: #fff; padding: 15px; text-align: center; font-size: 0.9em; }
 </style>
 </head>
 <body>
-<header>أدواتي الذكية — OCR + صور + أسعار</header>
-<div class="wrap">
 
-  <!-- إدخال يدوي أو صورة -->
-  <div class="card">
-    <div class="row">
-      <input id="inp" class="input" placeholder="اكتب اسم المنتج أو اختر صورة"/>
-      <input type="file" id="imgFile" accept="image/*"/>
-      <button class="btn" id="addBtn">إضافة بالذكاء</button>
-    </div>
-    <div class="chipbar tiny muted" style="margin-top:8px">
-      أمثلة سريعة:
-      <span class="chip" data-q="دفتر 96 صفحة A4 غلاف أزرق">دفتر 96 صفحة A4</span>
-      <span class="chip" data-q="كتاب الرياضيات سنة الأولى">كتاب الرياضيات</span>
-      <span class="chip" data-q="قلم حبر أزرق">قلم حبر أزرق</span>
-    </div>
-    <div class="hr"></div>
-    <div class="tiny muted">يمكنك رفع صورة لقائمة الأدوات وسيقوم الذكاء الصناعي بقراءة أسماء الأدوات وإضافتها تلقائيًا.</div>
-  </div>
+<header>
+  <h1>Wody Designer 🎨</h1>
+  <p>تصاميم مبتكرة: صور مصغرة، بانرات، أفتارات، شعارات وفن رقمي</p>
+</header>
 
-  <!-- القائمة -->
-  <div class="card">
-    <div class="row">
-      <input id="search" class="input" placeholder="ابحث في قائمتك…"/>
-      <button id="clearBtn" class="btn" style="background:#6c757d">حذف الكل</button>
-    </div>
-    <div id="list" class="grid"></div>
-  </div>
+<section class="gallery">
+  <img src="https://image2url.com/images/1755886566259-0ec17b75-77a9-4d71-b92e-f7887bdcd8bd.jpg" alt="تصميم Wody Designer">
+</section>
 
-</div>
+<section class="contact">
+  <h2>تواصل معي</h2>
+  <p>رقم الهاتف: +212 781-026190</p>
+  <a href="https://www.instagram.com/wody.designer/" target="_blank">إنستجرام</a>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<footer>
+  حقوق النشر © 2025 Wody Designer
+</footer>
 
-<script>
-/* ===================== أدوات عربية ===================== */
-function normalizeArabic(s){if(!s) return ''; return s.replace(/[\u064B-\u0652]/g,'').replace(/ـ/g,'').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[^\u0600-\u06FF0-9a-zA-Z\s]/g,' ').replace(/\s+/g,' ').trim();}
-function arabicDigitsToLatin(s){const map={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};return s.replace(/[٠-٩]/g,d=>map[d]||d);}
-function lev(a,b){a=a.toLowerCase();b=b.toLowerCase();const m=a.length,n=b.length;const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++) dp[i][0]=i;for(let j=0;j<=n;j++) dp[0][j]=j;for(let i=1;i<=m;i++) for(let j=1;j<=n;j++){const cost=a[i-1]===b[j-1]?0:1;dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+cost);}return dp[m][n];}
-
-/* ===================== قواميس ===================== */
-const CANON = {'دفتر':['دفتر','كراس'],'كتاب':['كتاب','مقرر'],'قلم حبر':['قلم حبر','قلم جاف'],'قلم رصاص':['قلم رصاص','HB'],'ألوان':['الوان'],'ممحاة':['ممحاه'],'مسطرة':['مسطره'],'براية':['مبراة'],'حقيبة':['حقيبه'],'آلة حاسبة':['حاسبه']};
-const COLORS = ['احمر','ازرق','ازرق داكن','ازرق فاتح','اخضر','اصفر','اسود','ابيض','برتقالي','بنفسجي','وردي','رمادي','بني','شفاف'];
-const SIZES  = ['A4','A5','A3','A6','B5','B4','B6'];
-const WORD_QTY = ['قطعه','قطع','نسخه','نسخ','علبه','علب','حبه','حبات'];
-
-/* ===================== تصنيف ===================== */
-function bestCanonical(token){let best='';let bestScore=1e9;for(const [canon,vars] of Object.entries(CANON)){for(const v of vars){const d=lev(token,normalizeArabic(v));if(d<bestScore){bestScore=d;best=canon;}}const d2=lev(token,normalizeArabic(canon));if(d2<bestScore){bestScore=d2;best=canon;}}return (bestScore<=2)?best:null;}
-function classify(textRaw){let text = arabicDigitsToLatin(normalizeArabic(textRaw)); const original=text; let qty=1; const qtyMatch=text.match(/(?:x|\*|\s)(\d{1,3})\b/) || text.match(new RegExp(`\\b(\\d{1,3})\\s*(?:${WORD_QTY.join('|')})\\b`)); if(qtyMatch) qty=parseInt(qtyMatch[1],10); let pages=null; const pg=text.match(/\b(\d{2,4})\s*(?:صفحه|ورقه|صفحات|ورقات|ص)\b/); if(pg) pages=parseInt(pg[1],10); let size=null; for(const s of SIZES){if(text.toUpperCase().includes(s)) {size=s;break;}} let color=null; for(const c of COLORS){if(text.includes(normalizeArabic(c))){color=c;break;}} const tokens=text.split(' '); let type=null; for(const t of tokens){const cand=bestCanonical(t); if(cand){type=cand;break;}} if(!type){if(/hb\b|\b2h\b|\bhb2\b/i.test(original)) type='قلم رصاص';} let subject=null; if(type==='كتاب'){const m=original.replace(/[0-9]/g,'').trim(); subject=m.replace(/كتاب|مقرر/gi,'').trim() || null;} let nameParts=[]; if(type) nameParts.push(type); if(subject) nameParts.push(subject); if(pages) nameParts.push(`${pages} صفحة`); if(size) nameParts.push(size); if(color) nameParts.push(color); const smartName=nameParts.join(' ').trim() || original; return { type:type||'أداة', name:smartName, qty,pages,size,color,raw:original, price:''};}
-
-/* ===================== صور تلقائية (placeholder) ===================== */
-async function fetchImage(query){return `https://via.placeholder.com/300x300?text=${encodeURIComponent(query)}`;}
-
-/* ===================== تخزين محلي ===================== */
-let items=JSON.parse(localStorage.getItem('ai_school_items')||'[]');
-function save(){localStorage.setItem('ai_school_items',JSON.stringify(items));}
-
-/* ===================== واجهة ===================== */
-const inp=document.getElementById('inp');
-const addBtn=document.getElementById('addBtn');
-const list=document.getElementById('list');
-const clearBtn=document.getElementById('clearBtn');
-const search=document.getElementById('search');
-const imgFile=document.getElementById('imgFile');
-
-document.querySelectorAll('.chip').forEach(ch=>{ch.addEventListener('click',()=>{inp.value=ch.dataset.q;});});
-
-async function addItem(name){
-  const obj=classify(name);
-  obj.img=await fetchImage(obj.name||obj.type);
-  items.push(obj);
-  save();
-  render();
-}
-
-addBtn.addEventListener('click', async ()=>{
-  addBtn.disabled=true; addBtn.textContent='يعالج…';
-  if(inp.value.trim()) await addItem(inp.value.trim());
-  else if(imgFile.files[0]){
-    const file=imgFile.files[0];
-    Tesseract.recognize(file,'ara').then(async({data:{text}})=>{
-      const lines=text.split('\n').filter(l=>l.trim());
-      for(const line of lines) await addItem(line.trim());
-    });
-  }
-  addBtn.disabled=false; addBtn.textContent='إضافة بالذكاء';
-  inp.value=''; imgFile.value='';
-});
-
-clearBtn.addEventListener('click',()=>{if(confirm('حذف كل العناصر؟')){items=[];save();render();}});
-search.addEventListener('input',render);
-
-function render(){
-  const q=normalizeArabic(search.value||'');
-  list.innerHTML='';
-  items.filter(it=>!q||normalizeArabic(it.name).includes(q)||normalizeArabic(it.type).includes(q))
-    .forEach((it,idx)=>{
-      const card=document.createElement('div'); card.className='card';
-      if(it.done) card.classList.add('done');
-      card.innerHTML=`
-        <div class="item">
-          <img class="thumb" src="${it.img}" alt="">
-          <div class="meta">
-            <div>
-              <strong>${it.name}</strong>
-              ${it.type?`<span class="tag">${it.type}</span>`:''}
-              ${it.pages?`<span class="tag">${it.pages} صفحة</span>`:''}
-              ${it.size?`<span class="tag">${it.size}</span>`:''}
-              ${it.color?`<span class="tag">${it.color}</span>`:''}
-              <span class="tag">كمية: <input class="qty" type="number" min="1" value="${it.qty}" data-i="${idx}"></span>
-              <span class="tag">السعر (DH): <input class="price" type="number" min="0" value="${it.price||''}" data-i="${idx}"></span>
-            </div>
-            <div class="actions">
-              <button class="btn ok" data-done="${idx}">${it.done?'إلغاء':'تم'}</button>
-              <button class="btn del" data-del="${idx}">حذف</button>
-            </div>
-            <div class="tiny muted">نص أصلي: ${it.raw}</div>
-          </div>
-        </div>`;
-      list.appendChild(card);
-    });
-
-  list.querySelectorAll('input.qty').forEach(el=>{el.onchange=e=>{const i=+e.target.dataset.i;items[i].qty=Math.max(1,parseInt(e.target.value||'1'));save();};});
-  list.querySelectorAll('input.price').forEach(el=>{el.onchange=e=>{const i=+e.target.dataset.i;items[i].price=parseFloat(e.target.value||'0');save();};});
-  list.querySelectorAll('button[data-done]').forEach(btn=>{btn.onclick=()=>{const i=+btn.dataset.done; items[i].done=!items[i].done; save(); render();};});
-  list.querySelectorAll('button[data-del]').forEach(btn=>{btn.onclick=()=>{const i=+btn.dataset.del; items.splice(i,1); save(); render();};});
-}
-render();
-</script>
 </body>
 </html>
